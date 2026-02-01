@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+name="RSS/Atom feed parser"
+version="0.0.1"
+authors = [
+  {name = "Anastasiia Kolodezhna", email = "nastya.kolodezhnaya@gmail.com"}
+]
+
+requires-python = ">= 3.11"
+dependencies=[
+    "feedparser"
+]
+
+# code style
+[tool.ruff]
+line-length = 120
+extend-select = [
+    "RUF100",  # Unused noqa
+    "I"  # isort rules
+]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.isort]
+line_length = 120
+profile = "black"
