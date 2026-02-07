@@ -31,4 +31,3 @@ def parse_with_modified():
 if __name__ == '__main__':
     parse_with_etag()
     parse_with_modified()
-
