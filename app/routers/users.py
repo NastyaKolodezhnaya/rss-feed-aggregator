@@ -10,7 +10,7 @@ router = APIRouter(prefix='/users', tags=['users'])
 
 
 @router.post('/create-user/')
-async def create_user(*, session: SessionDep, user: Annotated[User, Query()]):
+def create_user(*, session: SessionDep, user: Annotated[User, Query()]):
     # if exists: raise UserExistsError
     create_user_service(session, user)
     return {'result': 'ok'}
