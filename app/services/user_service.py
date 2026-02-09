@@ -1,5 +1,5 @@
-from app.models.user import User as User_Db
-from app.schemas.user import User as User_Create
+from app.models import User as User_Db
+from app.schemas import User as User_Create
 from app.utils.hash import get_hashed_password
 
 
