@@ -1,33 +1,65 @@
+from dataclasses import dataclass
+from datetime import datetime
+
 import feedparser
 
-link_rss = 'https://joshua.hu/feed.xml'
-link_atom = 'https://www.martinfowler.com/feed.atom'
 
-# rss = feedparser.parse(link_rss)
-
-
-def parse_with_etag():
-    atom = feedparser.parse(link_atom)
-    etag = atom.etag
-
-    atom1 = feedparser.parse(link_atom, etag=etag)
-    etag1 = atom1.etag
-
-    print(etag == etag1)
-    print(atom1.status, getattr(atom1, 'debug_message', 'no message'))
+@dataclass
+class ParsedEntry:
+    title: str
+    link: str
+    summary: str
+    content: str
+    created_date: datetime
 
 
-def parse_with_modified():
-    atom = feedparser.parse(link_atom)
-    modified = atom.modified
+@dataclass
+class ParsedSource:
+    title: str
+    author: str
+    link: str
+    feed_link: str
+    last_etag: str
+    last_modified: datetime
+    entries: list[ParsedEntry]
 
-    atom1 = feedparser.parse(link_atom, modified=modified)
-    modified1 = atom1.modified
 
-    print(modified == modified1)
-    print(atom1.status, getattr(atom1, 'debug_message', 'no message'))
+def parse_feed_datetime(date_str: str):
+    return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z')
 
 
-if __name__ == '__main__':
-    parse_with_etag()
-    parse_with_modified()
+def parse_entry_datetime(date_str: str):
+    return datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S%z')
+
+
+def construct_new_feed(feed_link: str):
+    source = feedparser.parse(feed_link)
+    entries = [construct_entry(e) for e in source.entries]
+
+    return ParsedSource(
+        title=source.feed.title,
+        author=source.feed.author,
+        link=source.feed.link,
+        feed_link=source.feed.id,
+        last_etag=source.etag,
+        last_modified=parse_feed_datetime(source.updated),
+        entries=entries,
+    )
+
+
+def construct_entry(entry):
+    content = '<p>'.join(c.value for c in entry.content)  # todo: see how it's going with multiple content
+    return ParsedEntry(
+        title=entry.title,
+        link=entry.link,
+        summary=entry.summary,
+        content=content,
+        created_date=parse_entry_datetime(entry.updated),
+    )
+
+
+def parse_feed(feed_link: str, last_etag: str, last_modified: datetime):
+    res = feedparser.parse(feed_link, etag=last_etag, modified=last_modified)
+    if res.status == '304':
+        return None
+    return [construct_entry(e) for e in res.entries]
