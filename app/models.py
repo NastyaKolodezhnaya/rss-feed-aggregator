@@ -19,6 +19,7 @@ user_to_source = Table(
 class User(Base):
     __tablename__ = 'users'
 
+    # todo: make id not consequential
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30))
     email: Mapped[str] = mapped_column(String(100), unique=True)
