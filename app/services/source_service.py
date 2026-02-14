@@ -1,19 +1,19 @@
 from dataclasses import asdict
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 
 from app.models import Entry as Entry_Db
 from app.models import Source as Source_Db
 from app.utils.parse import construct_new_feed
 
 
-def source_exists(session, feed_link: str):
+def source_exists(session, feed_link: str) -> Source_Db | None:
     stmt = select(Source_Db).where(Source_Db.feed_link == feed_link)
     result = session.execute(stmt)
     return result.scalars().first() or None
 
 
-def create_source(session, feed_link: str):
+def add_new_source(session, feed_link: str) -> Source_Db:
     source_data = construct_new_feed(feed_link)
 
     source_kwargs = asdict(source_data)
@@ -23,3 +23,15 @@ def create_source(session, feed_link: str):
 
     session.add(source_db)
     session.commit()
+    return source_db
+
+
+def get_source_by_id(session, source_id: int) -> Source_Db:
+    stmt = select(Source_Db).where(Source_Db.id == source_id)
+    result = session.execute(stmt)
+    return result.scalars().first() or None
+
+
+def delete_source_by_id(session, source_id: int):
+    stmt = delete(Source_Db).where(Source_Db.id == source_id)
+    session.execute(stmt)
