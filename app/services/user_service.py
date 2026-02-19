@@ -2,11 +2,11 @@ from sqlalchemy import select
 
 from app.models import Source as Source_Db
 from app.models import User as User_Db
-from app.schemas import User as User_Create
+from app.schemas import UserCreate
 from app.utils.hash import check_password, get_hashed_password
 
 
-def create_user(session, user_create: User_Create) -> User_Db:
+def create_user(session, user_create: UserCreate) -> User_Db:
     hash_pass = get_hashed_password(user_create.password)  # todo: move to frontend
     db_user = User_Db(username=user_create.username, email=user_create.email, password_hash=hash_pass)
 
@@ -22,7 +22,7 @@ def get_user_by_id(session, user_id: int) -> User_Db | None:
 
 
 def get_user_by_name(session, username: str) -> User_Db | None:
-    stmt = select(User_Db).where(User_Db.name == username)
+    stmt = select(User_Db).where(User_Db.username == username)
     result = session.execute(stmt)
     return result.scalars().first()
 

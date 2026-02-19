@@ -9,11 +9,17 @@ class ConfiguredModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class User(ConfiguredModel):
-    id: int
+class UserCreate(ConfiguredModel):
     username: str
     email: str  # todo: add email validation
     password: str = Field(min_length=8)
+
+
+class User(ConfiguredModel):
+    id: int
+    username: str
+    email: str
+    password_hash: bytes
 
 
 class Entry(ConfiguredModel):
