@@ -21,14 +21,14 @@ class User(Base):
 
     # todo: make id not consequential
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30))
+    username: Mapped[str] = mapped_column(String(30), unique=True)
     email: Mapped[str] = mapped_column(String(100), unique=True)
     password_hash: Mapped[bytes]
 
     sources = relationship('Source', secondary=user_to_source, back_populates='users')
 
     def __repr__(self) -> str:
-        return f'User(id={self.id!r}, name={self.name!r}, email={self.email!r})'
+        return f'User(id={self.id!r}, username={self.username!r}, email={self.email!r})'
 
 
 class Source(Base):

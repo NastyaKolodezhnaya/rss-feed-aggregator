@@ -30,7 +30,11 @@ def get_entry_by_id(session, entry_id: int) -> Entry_Db | None:
 
 def get_all_user_entries(session, user: User, n: int):
     stmt = (
-        select(Entry_Db.title, Source_Db.title, Entry_Db.created_date)
+        select(
+            Entry_Db.title.label('entry_title'),
+            Source_Db.title.label('source_title'),
+            Entry_Db.created_date,
+        )
         .join(Source_Db, Entry_Db.source_id == Source_Db.id)
         .join(user_to_source, user_to_source.c.source_id == Source_Db.id)
         .where(user_to_source.c.user_id == user.id)

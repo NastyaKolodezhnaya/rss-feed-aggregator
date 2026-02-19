@@ -34,6 +34,8 @@ def get_current_user_session(request: Request, db_session: Session = SessionDep)
     if not user_id:
         raise HTTPException(status_code=401)
     user_db = get_user_by_id(db_session, user_id)
+    if not user_db:
+        raise HTTPException(status_code=401)
     return User.model_validate(user_db)
 
 
