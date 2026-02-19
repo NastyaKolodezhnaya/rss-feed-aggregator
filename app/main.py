@@ -17,5 +17,5 @@ app.add_middleware(
     SessionMiddleware,
     secret_key=os.getenv('SESSION_SECRET_KEY'),
     max_age=3600,  # an hour
-    https_only=True,
+    https_only=os.getenv('HTTPS_ONLY', 'false').lower() == 'true',
 )

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.deps import SessionDep, UserDep
+from app.deps import SessionDepType, UserDep, UserDepType
 from app.schemas import EntryBrief, EntryBriefListResponse, EntryListResponse, EntryResponse
 from app.services.entry_service import add_new_entries, get_all_user_entries, get_entry_by_id
 from app.services.source_service import get_source_by_id
@@ -10,7 +10,7 @@ router = APIRouter(prefix='/entries', tags=['entries'], dependencies=[UserDep])
 
 
 @router.get('/fetch/{source_id}', response_model=EntryListResponse)
-def fetch_entries(*, session: SessionDep, source_id: int):
+def fetch_entries(*, session: SessionDepType, source_id: int):
     src = get_source_by_id(session, source_id)
     if not src:
         raise HTTPException(status_code=404, detail='Source not found.')
@@ -22,7 +22,7 @@ def fetch_entries(*, session: SessionDep, source_id: int):
 
 
 @router.get('/source/{source_id}', response_model=EntryListResponse)
-def get_entries_by_source(*, session: SessionDep, source_id: int):
+def get_entries_by_source(*, session: SessionDepType, source_id: int):
     src = get_source_by_id(session, source_id)
     if not src:
         raise HTTPException(status_code=404, detail='Source not found.')
@@ -30,7 +30,7 @@ def get_entries_by_source(*, session: SessionDep, source_id: int):
 
 
 @router.get('/detail/{entry_id}', response_model=EntryResponse)
-def get_entry(*, session: SessionDep, entry_id: int):
+def get_entry(*, session: SessionDepType, entry_id: int):
     entry = get_entry_by_id(session, entry_id)
     if not entry:
         raise HTTPException(status_code=404, detail='Entry not found.')
@@ -38,7 +38,7 @@ def get_entry(*, session: SessionDep, entry_id: int):
 
 
 @router.get('/list/{n}', response_model=EntryBriefListResponse)
-def list_entries(*, session: SessionDep, user: UserDep, n: int):
+def list_entries(*, session: SessionDepType, user: UserDepType, n: int):
     if n <= 0:
         raise HTTPException(status_code=422, detail='Number of entries must be positive.')
     rows = get_all_user_entries(session, user, n)

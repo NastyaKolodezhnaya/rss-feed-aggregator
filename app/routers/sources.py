@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.deps import SessionDep, UserDep
+from app.deps import SessionDepType, UserDep, UserDepType
 from app.schemas import SourceListResponse, SourceResponse
 from app.services.source_service import add_new_source, delete_source_by_id, get_source_by_id, source_exists
 from app.services.user_service import add_new_user_source, get_user_by_id
@@ -9,7 +9,7 @@ router = APIRouter(prefix='/sources', tags=['sources'], dependencies=[UserDep])
 
 
 @router.post('/add')
-def add_source(*, session: SessionDep, user: UserDep, feed_link: str):
+def add_source(*, session: SessionDepType, user: UserDepType, feed_link: str):
     existing = source_exists(session, feed_link)
     if not existing:
         existing = add_new_source(session, feed_link)
@@ -21,13 +21,13 @@ def add_source(*, session: SessionDep, user: UserDep, feed_link: str):
 
 
 @router.get('/list', response_model=SourceListResponse)
-def get_sources_by_user(*, session: SessionDep, user: UserDep):
+def get_sources_by_user(*, session: SessionDepType, user: UserDepType):
     user_db = get_user_by_id(session, user.id)
     return {'sources': user_db.sources}
 
 
 @router.get('/{source_id}', response_model=SourceResponse)
-def get_source(*, session: SessionDep, source_id: int):
+def get_source(*, session: SessionDepType, source_id: int):
     source = get_source_by_id(session, source_id)
     if not source:
         raise HTTPException(status_code=404, detail='Source not found.')
@@ -35,7 +35,7 @@ def get_source(*, session: SessionDep, source_id: int):
 
 
 @router.delete('/delete/{source_id}')
-def delete_source(*, session: SessionDep, source_id: int):
+def delete_source(*, session: SessionDepType, source_id: int):
     deleted = delete_source_by_id(session, source_id)
     if not deleted:
         raise HTTPException(status_code=404, detail='Source not found.')

@@ -26,10 +26,11 @@ def get_db() -> Generator[Session, None, None]:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Depends(get_db)
+SessionDepType = Annotated[Session, Depends(get_db)]
 
 
-def get_current_user_session(request: Request, db_session: Session = SessionDep):
+def get_current_user_session(request: Request, db_session: SessionDepType):
     user_id = request.session.get('user_id')
     if not user_id:
         raise HTTPException(status_code=401)
@@ -39,4 +40,5 @@ def get_current_user_session(request: Request, db_session: Session = SessionDep)
     return User.model_validate(user_db)
 
 
-UserDep = Annotated[User, Depends(get_current_user_session)]
+UserDep = Depends(get_current_user_session)
+UserDepType = Annotated[User, UserDep]
