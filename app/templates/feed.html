@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Feed - RSS Feed Aggregator{% endblock %}
+
+{% block nav %}
+<div class="flex items-center gap-4">
+    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
+    <form method="post" action="/users/logout" class="inline">
+        <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-800 mb-6">Latest Entries</h1>
+
+{% if entries %}
+<div class="space-y-3">
+    {% for entry in entries %}
+    <a href="/entries/detail/{{ entry.entry_id }}" class="block bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+        <h2 class="text-lg font-medium text-gray-900">{{ entry.entry_title }}</h2>
+        <div class="mt-1 flex items-center gap-3 text-sm text-gray-500">
+            <span>{{ entry.source_title }}</span>
+            <span>&middot;</span>
+            <span>{{ entry.created_date.strftime('%b %d, %Y') }}</span>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12 text-gray-500">
+    <p class="text-lg">No entries yet.</p>
+    <p class="mt-2">
+        <a href="/sources/list" class="text-blue-600 hover:underline">Add some sources</a> to get started.
+    </p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,2 @@
+class RedirectToLogin(Exception):
+    pass

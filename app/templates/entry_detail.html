@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ entry.title }} - RSS Feed Aggregator{% endblock %}
+
+{% block nav %}
+<div class="flex items-center gap-4">
+    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
+    <form method="post" action="/users/logout" class="inline">
+        <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<article>
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ entry.title }}</h1>
+    <div class="flex items-center gap-3 text-sm text-gray-500 mb-6">
+        <span>{{ entry.created_date.strftime('%b %d, %Y') }}</span>
+        <span>&middot;</span>
+        <a href="{{ entry.link }}" target="_blank" class="text-blue-600 hover:underline">Original article</a>
+        <span>&middot;</span>
+        <a href="/sources/{{ entry.source_id }}" class="text-blue-600 hover:underline">Source</a>
+    </div>
+
+    {% if entry.content %}
+    <div class="prose max-w-none bg-white rounded-lg border border-gray-200 p-6">
+        {{ entry.content | safe }}
+    </div>
+    {% elif entry.summary %}
+    <div class="prose max-w-none bg-white rounded-lg border border-gray-200 p-6">
+        {{ entry.summary | safe }}
+    </div>
+    {% endif %}
+</article>
+
+<div class="mt-6">
+    <a href="javascript:history.back()" class="text-sm text-blue-600 hover:underline">&larr; Back</a>
+</div>
+{% endblock %}

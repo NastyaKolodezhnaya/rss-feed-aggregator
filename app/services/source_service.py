@@ -4,6 +4,7 @@ from sqlalchemy import delete, select
 
 from app.models import Entry as Entry_Db
 from app.models import Source as Source_Db
+from app.services.entry_service import add_new_entries
 from app.utils.parse import ParsedSource, construct_new_feed
 
 
@@ -18,6 +19,10 @@ def add_new_source(session, feed_link: str) -> Source_Db | None:
 
     if not isinstance(source_data, ParsedSource):
         return None
+
+    if existing_source_db := source_exists(session, source_data.feed_link):
+        add_new_entries(session, existing_source_db.entries)
+        return existing_source_db
 
     source_kwargs = asdict(source_data)
     entries_kwargs = source_kwargs.pop('entries')
@@ -43,3 +48,9 @@ def delete_source_by_id(session, source_id: int) -> bool:
     session.execute(stmt)
     session.commit()
     return True
+
+
+def remove_source_if_orphaned(session, source_db: Source_Db) -> bool:
+    if not source_db.users:
+        return delete_source_by_id(session, source_db.id)
+    return False

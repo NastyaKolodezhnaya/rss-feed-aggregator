@@ -56,7 +56,7 @@ class Entry(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str]
-    link: Mapped[str]
+    link: Mapped[str] = mapped_column(unique=True)
     summary: Mapped[str]
     content: Mapped[str]
     created_date: Mapped[datetime]

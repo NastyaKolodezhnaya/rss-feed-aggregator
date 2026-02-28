@@ -1,0 +1,23 @@
+{% if sources %}
+<div class="space-y-2">
+    {% for source in sources %}
+    <div id="source-{{ source.id }}" class="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between">
+        <div>
+            <a href="/sources/{{ source.id }}" class="text-lg font-medium text-gray-900 hover:text-blue-600">
+                {{ source.title }}
+            </a>
+            <p class="text-sm text-gray-500">{{ source.author }}</p>
+        </div>
+        <button hx-delete="/sources/delete/{{ source.id }}"
+                hx-target="#source-{{ source.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Unsubscribe from {{ source.title }}?"
+                class="text-sm text-red-600 hover:text-red-800">
+            Unsubscribe
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-8">No sources yet. Add an RSS feed URL above.</p>
+{% endif %}

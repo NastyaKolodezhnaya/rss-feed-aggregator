@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Sources - RSS Feed Aggregator{% endblock %}
+
+{% block nav %}
+<div class="flex items-center gap-4">
+    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
+    <form method="post" action="/users/logout" class="inline">
+        <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold text-gray-800 mb-6">Your Sources</h1>
+
+<form hx-post="/sources/add" hx-target="#source-list" hx-swap="innerHTML"
+      class="flex gap-2 mb-6">
+    <input type="text" name="feed_link" placeholder="https://example.com/rss" required
+           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <button type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        Add Feed
+    </button>
+</form>
+
+<div id="source-list">
+    {% include "partials/source_list.html" %}
+</div>
+{% endblock %}

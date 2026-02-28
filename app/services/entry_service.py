@@ -9,9 +9,19 @@ from app.schemas import User
 from app.utils.parse import ParsedEntry
 
 
+def entry_exists(session, entry_link: str):
+    stmt = select(Entry_Db).where(Entry_Db.link == entry_link)
+    result = session.execute(stmt)
+    return result.scalars().first() or None
+
+
 def add_new_entries(session, entries: list[ParsedEntry]):
     final_entries = []
     for entry in entries:
+        if entry_exists(session, entry.link):
+            final_entries.append(entry)
+            continue
+
         entries_kwargs = asdict(entry)
         entry_db = Entry_Db(**entries_kwargs)
 
@@ -31,6 +41,7 @@ def get_entry_by_id(session, entry_id: int) -> Entry_Db | None:
 def get_all_user_entries(session, user: User, n: int):
     stmt = (
         select(
+            Entry_Db.id.label('entry_id'),
             Entry_Db.title.label('entry_title'),
             Source_Db.title.label('source_title'),
             Entry_Db.created_date,

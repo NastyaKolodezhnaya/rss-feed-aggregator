@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ source.title }} - RSS Feed Aggregator{% endblock %}
+
+{% block nav %}
+<div class="flex items-center gap-4">
+    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
+    <form method="post" action="/users/logout" class="inline">
+        <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">{{ source.title }}</h1>
+    <p class="text-gray-500 mt-1">by {{ source.author }}</p>
+    <a href="{{ source.link }}" target="_blank" class="text-sm text-blue-600 hover:underline">{{ source.link }}</a>
+</div>
+
+<div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold text-gray-700">Entries</h2>
+    <button hx-get="/entries/fetch/{{ source.id }}"
+            hx-target="#entry-list"
+            hx-swap="innerHTML"
+            class="bg-blue-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-blue-700 transition-colors">
+        Refresh
+    </button>
+</div>
+
+<div id="entry-list">
+    {% include "partials/entry_list.html" with context %}
+</div>
+{% endblock %}

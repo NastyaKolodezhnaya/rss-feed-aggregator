@@ -2,10 +2,11 @@ import os
 from typing import Annotated, Generator
 
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, Request
+from fastapi import Depends, Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from app.exceptions import RedirectToLogin
 from app.schemas import User
 from app.services.user_service import get_user_by_id
 
@@ -18,7 +19,7 @@ POSTGRES_URI = (
     f'/{os.getenv("POSTGRES_DB")}'
 )
 
-engine = create_engine(POSTGRES_URI, echo=True)
+engine = create_engine(POSTGRES_URI, echo=False)
 
 
 def get_db() -> Generator[Session, None, None]:
@@ -33,10 +34,10 @@ SessionDepType = Annotated[Session, Depends(get_db)]
 def get_current_user_session(request: Request, db_session: SessionDepType):
     user_id = request.session.get('user_id')
     if not user_id:
-        raise HTTPException(status_code=401)
+        raise RedirectToLogin()
     user_db = get_user_by_id(db_session, user_id)
     if not user_db:
-        raise HTTPException(status_code=401)
+        raise RedirectToLogin()
     return User.model_validate(user_db)
 
 

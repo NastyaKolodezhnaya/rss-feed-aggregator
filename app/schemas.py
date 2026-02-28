@@ -2,8 +2,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# todo:  add proper request structures
-
 
 class ConfiguredModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -48,34 +46,7 @@ class Source(SourceSummary):
 
 
 class EntryBrief(ConfiguredModel):
+    entry_id: int
     entry_title: str
     source_title: str
     created_date: datetime
-
-
-# --- Response wrappers ---
-
-
-class SourceListResponse(BaseModel):
-    sources: list[SourceSummary]
-
-
-class SourceResponse(BaseModel):
-    source: Source
-
-
-class EntryListResponse(BaseModel):
-    entries: list[Entry]
-
-
-class EntryResponse(BaseModel):
-    entry: Entry
-
-
-class EntryBriefListResponse(BaseModel):
-    entries: list[EntryBrief]
-
-
-class AuthFormRequest(BaseModel):
-    username: str
-    password: str
