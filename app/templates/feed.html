@@ -4,7 +4,7 @@
 
 {% block nav %}
 <div class="flex items-center gap-4">
-    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/entries/list" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
     <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
     <form method="post" action="/users/logout" class="inline">
         <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
@@ -16,18 +16,40 @@
 <h1 class="text-2xl font-bold text-gray-800 mb-6">Latest Entries</h1>
 
 {% if entries %}
-<div class="space-y-3">
+<div>
+    {% set current_month = namespace(value='') %}
     {% for entry in entries %}
-    <a href="/entries/detail/{{ entry.entry_id }}" class="block bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-        <h2 class="text-lg font-medium text-gray-900">{{ entry.entry_title }}</h2>
+    {% set month_label = entry.created_date.strftime('%B %Y') %}
+    {% if month_label != current_month.value %}
+        {% set current_month.value = month_label %}
+        <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide {{ 'mt-8' if not loop.first else '' }} mb-3">
+            {{ month_label }}
+        </h2>
+    {% endif %}
+    <a href="/entries/detail/{{ entry.entry_id }}" class="block bg-white rounded-lg border border-gray-200 p-4 mb-2 hover:shadow-md transition-shadow">
+        <h3 class="text-lg font-medium text-gray-900">{{ entry.entry_title }}</h3>
         <div class="mt-1 flex items-center gap-3 text-sm text-gray-500">
             <span>{{ entry.source_title }}</span>
             <span>&middot;</span>
-            <span>{{ entry.created_date.strftime('%b %d, %Y') }}</span>
+            <span>{{ entry.created_date.strftime('%b %d') }}</span>
         </div>
     </a>
     {% endfor %}
 </div>
+{% if total_pages > 1 %}
+<nav class="flex items-center justify-center gap-2 mt-8">
+    {% if page > 1 %}
+    <a href="/entries/list?page={{ page - 1 }}"
+       class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100">&larr; Newer</a>
+    {% endif %}
+    <span class="text-sm text-gray-500">Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+    <a href="/entries/list?page={{ page + 1 }}"
+       class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100">Older &rarr;</a>
+    {% endif %}
+</nav>
+{% endif %}
+
 {% else %}
 <div class="text-center py-12 text-gray-500">
     <p class="text-lg">No entries yet.</p>

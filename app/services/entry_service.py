@@ -38,7 +38,7 @@ def get_entry_by_id(session, entry_id: int) -> Entry_Db | None:
     return result or None
 
 
-def get_all_user_entries(session, user: User, n: int):
+def get_all_user_entries(session, user: User, limit: int, offset: int = 0):
     stmt = (
         select(
             Entry_Db.id.label('entry_id'),
@@ -50,6 +50,37 @@ def get_all_user_entries(session, user: User, n: int):
         .join(user_to_source, user_to_source.c.source_id == Source_Db.id)
         .where(user_to_source.c.user_id == user.id)
         .order_by(Entry_Db.created_date.desc())
-        .limit(n)
+        .limit(limit)
+        .offset(offset)
     )
     return session.execute(stmt).all()
+
+
+def get_entries_by_source(session, source_id: int, limit: int, offset: int = 0):
+    stmt = (
+        select(Entry_Db)
+        .where(Entry_Db.source_id == source_id)
+        .order_by(Entry_Db.created_date.desc())
+        .limit(limit)
+        .offset(offset)
+    )
+    return session.execute(stmt).scalars().all()
+
+
+def count_source_entries(session, source_id: int) -> int:
+    from sqlalchemy import func
+
+    stmt = select(func.count(Entry_Db.id)).where(Entry_Db.source_id == source_id)
+    return session.execute(stmt).scalar() or 0
+
+
+def count_user_entries(session, user: User) -> int:
+    from sqlalchemy import func
+
+    stmt = (
+        select(func.count(Entry_Db.id))
+        .join(Source_Db, Entry_Db.source_id == Source_Db.id)
+        .join(user_to_source, user_to_source.c.source_id == Source_Db.id)
+        .where(user_to_source.c.user_id == user.id)
+    )
+    return session.execute(stmt).scalar() or 0

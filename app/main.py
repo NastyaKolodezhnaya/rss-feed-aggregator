@@ -41,7 +41,7 @@ def redirect_to_login(_request: Request, _exc: RedirectToLogin):
 def root(request: Request):
     user_id = request.session.get('user_id')
     if user_id:
-        return RedirectResponse('/entries/list/20', status_code=303)
+        return RedirectResponse('/entries/list', status_code=303)
     return RedirectResponse('/users/login', status_code=303)
 
 

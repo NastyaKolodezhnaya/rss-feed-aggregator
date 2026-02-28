@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Form, HTTPException, Request, Response
+from fastapi import APIRouter, Form, HTTPException, Query, Request, Response
 
 from app.deps import SessionDepType, UserDep, UserDepType
+from app.services.entry_service import count_source_entries, get_entries_by_source
 from app.services.source_service import add_new_source, get_source_by_id, remove_source_if_orphaned, source_exists
 from app.services.user_service import add_new_user_source, get_user_by_id, unsubscribe_user_from_source
 from app.template import templates
+from app.utils.pagination import paginate
 
 router = APIRouter(prefix='/sources', tags=['sources'], dependencies=[UserDep])
 
@@ -28,11 +30,25 @@ def get_sources_by_user(*, request: Request, session: SessionDepType, user: User
 
 
 @router.get('/{source_id}')
-def get_source(*, request: Request, session: SessionDepType, source_id: int):
+def get_source(*, request: Request, session: SessionDepType, source_id: int, page: int = Query(1, ge=1)):
     source = get_source_by_id(session, source_id)
     if not source:
         raise HTTPException(status_code=404, detail='Source not found.')
-    return templates.TemplateResponse(request, 'source_detail.html', {'source': source, 'entries': source.entries})
+
+    total = count_source_entries(session, source_id)
+    pag = paginate(total, page)
+
+    entries = get_entries_by_source(session, source_id, limit=pag.limit, offset=pag.offset)
+    return templates.TemplateResponse(
+        request,
+        'source_detail.html',
+        {
+            'source': source,
+            'entries': entries,
+            'page': pag.page,
+            'total_pages': pag.total_pages,
+        },
+    )
 
 
 @router.delete('/delete/{source_id}')

@@ -4,7 +4,7 @@
 
 {% block nav %}
 <div class="flex items-center gap-4">
-    <a href="/entries/list/20" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
+    <a href="/entries/list" class="text-sm text-gray-600 hover:text-gray-800">Feed</a>
     <a href="/sources/list" class="text-sm text-gray-600 hover:text-gray-800">Sources</a>
     <form method="post" action="/users/logout" class="inline">
         <button type="submit" class="text-sm text-gray-600 hover:text-gray-800">Logout</button>
@@ -32,4 +32,18 @@
 <div id="entry-list">
     {% include "partials/entry_list.html" with context %}
 </div>
+
+{% if total_pages > 1 %}
+<nav class="flex items-center justify-center gap-2 mt-8">
+    {% if page > 1 %}
+    <a href="/sources/{{ source.id }}?page={{ page - 1 }}"
+       class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100">&larr; Newer</a>
+    {% endif %}
+    <span class="text-sm text-gray-500">Page {{ page }} of {{ total_pages }}</span>
+    {% if page < total_pages %}
+    <a href="/sources/{{ source.id }}?page={{ page + 1 }}"
+       class="px-3 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-100">Older &rarr;</a>
+    {% endif %}
+</nav>
+{% endif %}
 {% endblock %}

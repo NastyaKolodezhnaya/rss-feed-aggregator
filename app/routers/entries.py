@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.deps import SessionDepType, UserDep, UserDepType
 from app.schemas import EntryBrief
-from app.services.entry_service import add_new_entries, get_all_user_entries, get_entry_by_id
+from app.services.entry_service import add_new_entries, count_user_entries, get_all_user_entries, get_entry_by_id
 from app.services.source_service import get_source_by_id
 from app.template import templates
+from app.utils.pagination import paginate
 from app.utils.parse import parse_feed
 
 router = APIRouter(prefix='/entries', tags=['entries'], dependencies=[UserDep])
@@ -40,10 +41,19 @@ def get_entry(*, request: Request, session: SessionDepType, entry_id: int):
     return templates.TemplateResponse(request, 'entry_detail.html', {'entry': entry})
 
 
-@router.get('/list/{n}')
-def list_entries(*, request: Request, session: SessionDepType, user: UserDepType, n: int):
-    if n <= 0:
-        raise HTTPException(status_code=422, detail='Number of entries must be positive.')
-    rows = get_all_user_entries(session, user, n)
+@router.get('/list')
+def list_entries(*, request: Request, session: SessionDepType, user: UserDepType, page: int = Query(1, ge=1)):
+    total = count_user_entries(session, user)
+    pag = paginate(total, page)
+
+    rows = get_all_user_entries(session, user, limit=pag.limit, offset=pag.offset)
     entries = [EntryBrief.model_validate(row) for row in rows]
-    return templates.TemplateResponse(request, 'feed.html', {'entries': entries})
+    return templates.TemplateResponse(
+        request,
+        'feed.html',
+        {
+            'entries': entries,
+            'page': pag.page,
+            'total_pages': pag.total_pages,
+        },
+    )

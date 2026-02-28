@@ -44,7 +44,7 @@ def login(*, request: Request, session: SessionDepType, username: str = Form(), 
         return templates.TemplateResponse(request, 'login.html', {'error': 'Invalid username or password.'})
 
     request.session['user_id'] = user.id
-    return RedirectResponse('/entries/list/20', status_code=303)
+    return RedirectResponse('/entries/list', status_code=303)
 
 
 @router.post('/logout', dependencies=[UserDep])
