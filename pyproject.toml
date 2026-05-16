@@ -19,6 +19,7 @@ dependencies=[
     "python-dotenv",
     "bcrypt",
     "jinja2",
+    "alembic",
 ]
 
 # code style
